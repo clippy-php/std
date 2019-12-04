@@ -6,7 +6,7 @@ trying to be friendly.
 
 ```php
 <?php
-#!requrie totten/silly: 0.1.0
+#!require totten/silly: 0.1.0
 $c = clippy()->register(plugins());
 
 $c['app']->main('name', function ($name, $io) {
