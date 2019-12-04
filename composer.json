@@ -1,0 +1,25 @@
+{
+    "name": "totten/clippy",
+    "description": "TODO",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Tim Otten",
+            "email": "totten@civicrm.org"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "mnapoli/silly": "~1.7",
+        "pimple/pimple": "^3.0"
+    },
+    "autoload": {
+        "files": ["utils.php"],
+        "psr-4": {
+            "Clippy\\": "src/"
+         }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
