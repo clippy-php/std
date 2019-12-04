@@ -59,10 +59,10 @@ class Credentials {
         $io->note("Credential $name not found in $storage");
       }
       if ($context === 'default') {
-        $pass = $io->askHidden(sprintf('Please enter credential %s for %s:', $name, $context));
+        $pass = $io->askHidden(sprintf('Please enter credential %s for %s', $name, $context));
       }
       else {
-        $pass = $io->askHidden(sprintf('Please enter credential %s:', $name));
+        $pass = $io->askHidden(sprintf('Please enter credential %s', $name));
       }
       // TODO save
       return $pass;
