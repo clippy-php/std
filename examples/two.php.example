@@ -1,0 +1,11 @@
+<?php
+namespace Clippy;
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Usage: php two.php.example Bob
+
+$c = clippy()->register(plugins());
+
+$c['app']->main('name', function ($name, $io) {
+  $io->writeln("Hello, <comment>$name</comment>!");
+});

@@ -1,0 +1,16 @@
+<?php
+namespace Clippy;
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Usage: php one.php.example greet Alice
+// Usage: php one.php.example farewell Bob
+
+$c = clippy()->register(plugins());
+
+$c['app']->command('greet yourName', function ($yourName, $io) {
+  $io->writeln("Hello, <comment>$yourName</comment>!");
+});
+$c['app']->command('farewell yourName', function ($yourName, $io) {
+  $io->writeln("So long, <comment>$yourName</comment>!");
+});
+$c['app']->run();
