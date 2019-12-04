@@ -110,8 +110,8 @@ class Container implements ContainerInterface, \ArrayAccess {
   /**
    * Register a service value or factory function.
    *
-   * @param $id
-   * @param $value
+   * @param string $id
+   * @param mixed $value
    * @return $this
    */
   public function set($id, $value) {
@@ -135,11 +135,22 @@ class Container implements ContainerInterface, \ArrayAccess {
     return $this;
   }
 
+  /**
+   * @param string $id
+   * @param callable $callable
+   * @return $this
+   * @see \Pimple\Container::extend()
+   */
   public function extend($id, $callable) {
     $this->pimple->extend($id, $this->inject(0, $callable));
     return $this;
   }
 
+  /**
+   * @param callable $callable
+   * @return callable
+   * @see \Pimple\Container::factory()
+   */
   public function factory($callable) {
     return $this->pimple->factory($this->inject(0, $callable));
   }
