@@ -162,30 +162,17 @@ function clippy(InputInterface $input = NULL, OutputInterface $output = NULL) {
 /**
  * Define the list of available plugins.
  *
- * @param string|array|null $name
- *   - If a string, then assigning values.
+ * @param array|null $names
  *   - If NULL, then returning all values.
  *   - If an array, then of the named items.
- * @param string|null $callback
  * @return array
  */
-function plugins($name = NULL, $callback = NULL) {
-  static $plugins = [];
-  if (is_string($name)) {
-    if ($callback === NULL) {
-      throw new \Exception("Invalid plugin declaration. Must specify callback.");
-    }
-    $plugins[$name] = $callback ?? [$name, 'register'];
-    return NULL;
-  }
-  elseif (is_array($name)) {
-    return array_intersect_key($plugins, array_fill_keys($name, 1));
+function plugins($names = NULL) {
+  if (is_array($names)) {
+    return array_intersect_key($GLOBALS['plugins'], array_fill_keys($names, 1));
   }
   else {
-    return $plugins;
+    return $GLOBALS['plugins'];
   }
 }
 
-plugins('app', ['\Clippy\ConsoleApp', 'register']);
-plugins('cred', ['\Clippy\Credentials', 'register']);
-plugins('guzzle', ['\Clippy\Guzzle', 'register']);

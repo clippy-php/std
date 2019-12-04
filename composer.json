@@ -14,7 +14,7 @@
         "pimple/pimple": "^3.0"
     },
     "autoload": {
-        "files": ["utils.php"],
+        "files": ["funcs.php", "plugins.php"],
         "psr-4": {
             "Clippy\\": "src/"
          }
