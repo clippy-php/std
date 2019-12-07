@@ -7,7 +7,7 @@ Clippy is a CLI framework for *scripting*  in PHP -- i.e. creating short, task-s
 ```php
 #!/usr/bin/env pogo
 <?php
-#!require totten/clippy: 0.1.0
+#!require clippy/std: 0.1.0
 namespace Clippy;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -53,7 +53,7 @@ Revised example:
 ```php
 #!/usr/bin/env pogo
 <?php
-#!require totten/clippy: 0.1.0
+#!require clippy/std: 0.1.0
 namespace Clippy;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
