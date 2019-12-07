@@ -2,12 +2,20 @@
 
 Clippy is a CLI framework for *scripting*  in PHP -- i.e. creating short, task-specific, standalone commands. It is heavily based on [mnapoli/silly](https://github.com/mnapoli/silly/).
 
-## Example (`greeter`)
+*Scripting* is a different domain than, say, *full business applications*.
+
+* In some ways, scripting is more modest: a full business application may have a wide variety of entities, screens, commands, and authors.  Dependencies and conventions among these various components must be reconciled.  By contrast, a script is generally focused on one task and has wider latitude to mix and match libraries and conventions.
+* In other ways, scripting is more stringent: the naming/structure/metadata should be quite thin to allow quick improvisation, and it should be easy+safely to frequently call out to other CLI commands.  By contrast, a full business app has more value built-in -- so it needs more structure to differentiate its internal components, and it doesn't need to call-out as frequently.
+
+Note: To simplify the workflows for dependency management, the examples use [pogo](http://github.com/totten/pogo).  `pogo` should be installed in the `PATH`.
+Alternatively, you can rework the examples - instead, create a new `composer` package for each script and run `composer require <package>:<version>` has needed.
+
+## Example (`greeter.php`)
 
 ```php
 #!/usr/bin/env pogo
 <?php
-#!require clippy/std: 0.1.0
+#!require clippy/std: 0.2.0
 namespace Clippy;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -20,13 +28,13 @@ $c['app']->main('yourName', function ($out, $yourName, SymfonyStyle $io) {
 Which one would execute as
 
 ```bash
-$ ./greeter world
+$ ./greeter.php world
 Hello, world!
 ```
 
 Things to observe in this example:
 
-* The notation `#!/usr/bin/env pogo` and `#!require <package>: <version>` allow you to load PHP packages in the script without creating a dedicated project for the script. You don't need to separately run `composer install`.
+* The notation s`#!/usr/bin/env pogo` and `#!require <package>: <version>` allow you to load PHP packages in the script without creating a dedicated project for the script. You don't need to separately run `composer install`.
 * The script is written within the `Clippy` namespace. This makes it easier to use helper functions.
 * The notation `$c = clippy()->register(plugins());` instantiates the system. It autoloads any *plugins* that have been pre-defined by other PHP packages.
 * The variable `$c` is a *service-container*. You may access services with the notation `$c['myService']`, and you can define services with `$c['myService'] = function(...){...}`.
@@ -44,8 +52,8 @@ Things to observe in this example:
 Let's extend the example just a little bit - allowing the user to optionally direct output to an alternative file. CLI commands often accept an option like `-o <file>` or `--out=<file>`.
 
 ```bash
-$ ./greeter world -o /tmp/greeting.txt
-$ ./greeter --out=/tmp/greeting.txt world
+$ ./greeter.php world -o /tmp/greeting.txt
+$ ./greeter.php --out=/tmp/greeting.txt world
 ```
 
 Revised example:
@@ -53,7 +61,7 @@ Revised example:
 ```php
 #!/usr/bin/env pogo
 <?php
-#!require clippy/std: 0.1.0
+#!require clippy/std: 0.2.0
 namespace Clippy;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
@@ -111,3 +119,62 @@ Clippy also adds/extends/changes a few things:
    ```
 * Clippy defines a *plugin* construct. Plugins may register new services. A plugin is simply a package which declares itself in `$GLOBALS['plugins']`. Plugins are autoloaded via convention `$c = clippy()->register(plugins())`, but they may (per perference) be loaded incrementally or piecemeal.
 
+## Plugins: Usage
+
+It's expected that typical usage would like:
+
+```php
+#!require foo/barplugin: 1.2.3
+$c = clippy()->register(plugins());
+```
+
+By default, the `plugins()` function will a list of all plugins defined in `$GLOBALS['plugins']`.
+
+If you need to pick and choose plugins (e.g.  to simulate different configurations in a testing environment), then simply pass in the list of desired plugins:
+
+```php
+#!require foo/barplugin: 1.2.3
+$c = clippy()->register(plugins(['bar', ...]));
+```
+
+## Plugins: Definition
+
+A plugin is a `composer` package with a PHP file (e.g. `plugin.php`) which defines some services. In
+brief, the package needs a file which says:
+
+```php
+$GLOBALS['plugins']['myplugin'] = function($container) {
+  $container['myservice'] = function() {
+    return new MyService();
+  };
+};
+```
+
+For a fuller consideration, you will need to create standard boilerplate:
+
+```
+mkdir myplugin
+git init
+composer init
+vi composer.json
+```
+
+In the `composer.json`, be sure to depend on `clippy/std` and
+define an `autoload` section:
+
+```json
+{
+    "name": "me/myplugin",
+    "require": {
+        "clippy/std": ">=0.2.0",
+    },
+    "autoload": {
+        "files": ["plugin.php"],
+        "psr-4": {"Clippy\\": "src/"}
+    }
+}
+```
+
+Use the `plugin.php` to define services, and use `src/**.php` to define new classes.
+
+Then post the code to Github/Packagist/etc and tag a release.
