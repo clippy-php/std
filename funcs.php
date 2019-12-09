@@ -106,14 +106,22 @@ function fromJSON($data) {
 /**
  * Builds an array-tree which indexes the records in an array.
  *
- * @param string[] $keys
+ * Ex:
+ *   $records = [ ['name'=>'Alice','id'=>100], ['name'=>'Bob', 'id'=>200] ];
+ *   $byId = index('id', $records);
+ *   assertThat($byId[200]['name'] === 'Bob');
+ *
+ * @param string|string[] $keys
  *   Properties by which to index.
- * @param object|array $records
+ *   If more than one key is given, then result will be a multi-dimensional array.
+ * @param array $records
+ *   Each record may be an object or array.
  *
  * @return array
  *   Multi-dimensional array, with one layer for each key.
  */
 function index($keys, $records) {
+  $keys = (array) $keys;
   $final_key = array_pop($keys);
 
   $result = [];
