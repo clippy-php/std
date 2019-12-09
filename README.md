@@ -1,4 +1,4 @@
-# Clippy
+# Clippy (Standard Edition)
 
 Clippy is a CLI framework for *scripting*  in PHP -- i.e. creating short, task-specific, standalone commands. It is heavily based on [mnapoli/silly](https://github.com/mnapoli/silly/).
 
