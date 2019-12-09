@@ -12,10 +12,14 @@ class Credentials {
   protected $CLIPPY_CRED;
 
   public static function register(Container $c) {
-    $c->env('CLIPPY_CRED', function () {
-      return joinPath(getenv('HOME'), '.config', 'clippy-cred');
+    // Path to the credentials file
+    $c->set('CLIPPY_CRED', function () {
+      return getenv('CLIPPY_CRED')
+        ? getenv('CLIPPY_CRED')
+        : joinPath(getenv('HOME'), '.config', 'clippy-cred');
     });
 
+    // The service object
     $c->set('cred', function (SymfonyStyle $io, $CLIPPY_CRED) {
       $cred = new Credentials();
       $cred->io = $io;
