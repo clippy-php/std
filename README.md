@@ -10,8 +10,9 @@ Clippy is a CLI framework for *scripting*  in PHP -- i.e. creating short, task-s
 Note: To simplify the workflows for dependency management, the examples use [pogo](http://github.com/totten/pogo).  `pogo` should be installed in the `PATH`.
 Alternatively, you can rework the examples - instead, create a new `composer` package for each script and run `composer require <package>:<version>` has needed.
 
-## Example (`greeter.php`)
+## Example
 
+<!-- It's nice to have an example which uses an option and an argument... -->
 ```php
 #!/usr/bin/env pogo
 <?php
@@ -19,8 +20,14 @@ Alternatively, you can rework the examples - instead, create a new `composer` pa
 namespace Clippy;
 
 $c = clippy()->register(plugins());
-$c['app']->main('yourName', function ($yourName, $io) {
-  $io->writeln("Hello, <comment>$yourName</comment>!");
+$c['app']->main('yourName [--lang=]', function ($yourName, $lang, $io) {
+  $messages = [
+    'de' => "Hallo, <comment>$yourName</comment>!",
+    'en' => "Hello, <comment>$yourName</comment>!",
+    'es' => "!Hola <comment>$yourName</comment>!",
+    'fr' => "Salut, <comment>$yourName</comment>!",
+  ];
+  $io->writeln($messages[$lang] ?? $messages['en']);
 });
 ```
 
@@ -29,6 +36,8 @@ Which one would execute as
 ```
 $ ./greeter.php world
 Hello, world!
+$ ./greeter.php Alice --lang=fr
+Salut, Alice!
 ```
 
 For more discussion and improvement of the example, see [docs/tutorial.md](/docs/tutorial.md).
