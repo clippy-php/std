@@ -118,4 +118,5 @@ Things to note:
 * The command signature changed:
     * Was: `$c['app']->main('yourName', function($yourName...))`
     * Now: `$c['app']->main('[-o|--out=] yourName', function($out, $yourName...))`
+* For `$io`, we've added a type-hint to indicate that it is an instance of `SymfonyStyle`.
 * `writeFile()` is a *service-method*. It is like a service -- it is stored in the container (`$c`), and you can inject services (like `$io`). However, it is also a like a function -- you can pass in runtime data to taste (`$file`, `$content`).

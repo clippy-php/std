@@ -17,10 +17,9 @@ Alternatively, you can rework the examples - instead, create a new `composer` pa
 <?php
 #!require clippy/std: 0.2.0
 namespace Clippy;
-use Symfony\Component\Console\Style\SymfonyStyle;
 
 $c = clippy()->register(plugins());
-$c['app']->main('yourName', function ($yourName, SymfonyStyle $io) {
+$c['app']->main('yourName', function ($yourName, $io) {
   $io->writeln("Hello, <comment>$yourName</comment>!");
 });
 ```
