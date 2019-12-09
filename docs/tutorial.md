@@ -94,6 +94,54 @@ namespace Clippy;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 $c = clippy()->register(plugins());
+$c['app']->main('[-o|--out=] yourName', function ($out, $yourName, SymfonyStyle $io) {
+  if ($out) {
+    file_put_contents($file, "Hello, $yourName!\n");
+  }
+  else {
+    $io->writeln("Hello, <comment>$yourName</comment>!");
+  }
+});
+```
+
+Things to note:
+
+* The command signature changed:
+    * Was: `$c['app']->main('yourName', function($yourName...))`
+    * Now: `$c['app']->main('[-o|--out=] yourName', function($out, $yourName...))`
+* For `$io`, we've added a type-hint to indicate that it is an instance of `SymfonyStyle`.
+
+Let's make another revision to address one more issue.  The use of `file_put_contents()` will overwrite any pre-existing files.  You might want a gentler version of `file_put_contents()`
+which prompts the user before overwriting, like in this hypothetical function:
+
+```php
+function writeFile($file, $content) {
+  if (file_exists($file)) {
+    $io->warning("The file $file already exists!");
+    if (!$io->confirm("Would you like to overwrite it?")) {
+      exit(1);
+    }
+  }
+  file_put_contents($file, $content);
+}
+```
+
+But that won't work - because `$io` is not in scope.  Moreover, `$io` (and its sibilings `$input`/`$output`) can be used frequently - as the app evolves, you can imagine many functions
+needing access to them.  Rather than pass those objects explicitly from every caller to every callee, we can use the container.
+
+In this case, we'll implement `writeFile()` as a *service-method*.  A service-method is like a service -- it is stored in the container (`$c`), and you can inject services (like `$io`) and
+use type-hinting (`SymfonyStyle $io`).  However, it is also like a function -- you can pass in runtime data to taste (`$file`, `$content`).
+
+Our final revision:
+
+```php
+#!/usr/bin/env pogo
+<?php
+#!require clippy/std: 0.2.0
+namespace Clippy;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+$c = clippy()->register(plugins());
 $c['writeFile()'] = function($file, $content, SymfonyStyle $io) {
   if (file_exists($file)) {
     $io->warning("The file $file already exists!");
@@ -112,11 +160,3 @@ $c['app']->main('[-o|--out=] yourName', function ($out, $yourName, SymfonyStyle 
   }
 });
 ```
-
-Things to note:
-
-* The command signature changed:
-    * Was: `$c['app']->main('yourName', function($yourName...))`
-    * Now: `$c['app']->main('[-o|--out=] yourName', function($out, $yourName...))`
-* For `$io`, we've added a type-hint to indicate that it is an instance of `SymfonyStyle`.
-* `writeFile()` is a *service-method*. It is like a service -- it is stored in the container (`$c`), and you can inject services (like `$io`). However, it is also a like a function -- you can pass in runtime data to taste (`$file`, `$content`).
