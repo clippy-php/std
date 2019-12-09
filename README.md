@@ -15,7 +15,7 @@ Alternatively, you can rework the examples - instead, create a new `composer` pa
 ```php
 #!/usr/bin/env pogo
 <?php
-#!require clippy/std: 0.2.0
+#!require clippy/std: ~0.2.0
 namespace Clippy;
 
 $c = clippy()->register(plugins());
