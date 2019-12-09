@@ -38,3 +38,4 @@ For more discussion and improvement of the example, see [docs/tutorial.md](/docs
 * [Technical synopsis](/docs/synopsis.md) - Summary of key libraries, services, structure
 * [Tutorial](/docs/tutorial.md) - Walk through a few examples
 * [Plugins](/docs/plugins.md) - Plugin mechanism
+* [Reference](/docs/reference.md) - List of functions and services in the standard edition
