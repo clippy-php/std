@@ -4,31 +4,31 @@ Unless otherwise indicated, all functions and classes described here are in the 
 
 ## Utility Functions
 
-The *utility functions* are small helpers.  They should generally be *true* functions, in they sense that they depend only upon their input and have no obscure side-effects.
+The *utility functions* are small helpers.  They should generally be *true* functions, in they sense that they are idempotent, depend only upon their input, and have no obscure side-effects.
 
-* `assertThat($bool, $msg = NULL)`: Ensure that `$bool` is `TRUE`; otherwise, throw an exception
-* `assertVal($val, $msg = NULL)`: Enuser that `$val` has a value (i.e. not-`NULL` and not-empty-string); otherwise, throw an exception
-* `index($keys, $records)`: Build an index over the `$records` which is keyed by `$keys`.
+* `assertThat(mixed $bool, $msg = NULL)`: Ensure that `$bool` is `TRUE`-ish; otherwise, throw an exception
+* `assertVal(mixed $val, $msg = NULL)`: Enuser that `$val` has a value (i.e. not-`NULL` and not-empty-string); otherwise, throw an exception
+* `index(string|string[] $keys, mixed[] $records) : array`: Build an index over the `$records` which is keyed by `$keys`.
 * `joinPath(...$parts)`: Concatentate the parts of a local file path
 * `joinUrl(...$parts)`: Concatenate the parts of a URL
-* `toJSON($mixed)`: Alias for `json_encode()`. Generates prettier output by default.
-* `fromJSON($mixed)`: Alias for `json_decode()`. Generates array-trees by default. Accepts a few object types (e.g. HTTP ResponseInterface) which can be converted to string.
+* `toJSON(mixed $mixed)`: Alias for `json_encode()`. Generates prettier output by default.
+* `fromJSON(mixed $mixed)`: Alias for `json_decode()`. Generates array-trees by default. Accepts a few object types (e.g. HTTP ResponseInterface) which can be converted to string.
 
 ## Framework Functions
 
 These are more opinionated functions. They are primarily entry-points for initializing the framework.
 
-* `clippy() : \Clippy\Container`: Instantiates a new container with the standard services.
-* `plugins($names = NULL) : callback[]`: Returns a list of available plugins. Optionally filter by a whitelist of names.
+* `clippy() : \Clippy\Container`: Instantiates a new container with the basic services.
+* `plugins(string[] $names = NULL) : callback[]`: Returns a list of available plugins. Optionally filter by a whitelist of names.
 
-## Standard Services
+## Basic Services
 
-The standard services are always registered in the container.
+The basic services are always registered in the container.
 
-* `input`: The active console input. https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Input/InputInterface.php
-* `output`: The active console output. https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Output/OutputInterface.php
-* `io`: A richer input/output helper. https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Style/SymfonyStyle.php
-* `container`: A self-reference to the service container. https://github.com/clippy-php/container
+* `input` (Symfony [InputInterface](https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Input/InputInterface.php)): The active console input.
+* `output` (Symfony [OutputInterface](https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Output/OutputInterface.php)): The active console output.
+* `io` (Symfony [SymfonyStyle](https://github.com/symfony/symfony/blob/3.4/src/Symfony/Component/Console/Style/SymfonyStyle.php)): A richer input/output helper.
+* `container` (Clippy [Container](https://github.com/clippy-php/container)): A self-reference to the service container.
 
 ## Plugin: `app` (`ConsoleApp.php`)
 
@@ -66,7 +66,6 @@ $c['openIssue()'] = function(Credentials $cred) {
   ...
 };
 ```
-
 
 ## Plugin: `guzzle` (`Guzzle.php`)
 
