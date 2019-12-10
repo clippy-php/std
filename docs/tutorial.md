@@ -8,15 +8,18 @@ Let's begin with a hello-world script. Using basic PHP, you might write `greeter
 printf("Hello, %s!", $argv[1]);
 ```
 
-Which one would execute as
+One would execute this as:
 
 ```
+$ chmod +x greeter.php
 $ ./greeter.php world
 Hello, world!
 ```
 
 However, this as a bit spartan -- there's no help screen, there's no parsing
 or valiadtion of `$argv`, there's no console interaction or styling.
+
+The [symfony/console](https://symfony.com/doc/3.4/components/console.html) library provides a bunch of great classes to support those things - `InputInterface $input`, `OutputInterface $output`, `SymfonyStyle $io`, and so on. To use these conventionally, you have to create a set of classes (`Command`s and `Application`s). Clippy provides the same classes in a different packaging - so you can prototype an application with less boilerplate.
 
 With Clippy, a similar `greeter.php` would look like:
 
@@ -32,7 +35,7 @@ $c['app']->main('yourName', function ($yourName, $io) {
 });
 ```
 
-Which one would again execute as
+Again, one would execute:
 
 ```
 $ ./greeter.php world
