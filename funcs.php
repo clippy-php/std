@@ -64,7 +64,7 @@ function joinPath(...$parts) {
 }
 
 /**
- * Combine all elements of part, in order, to form a string - using URL delimiters.
+ * Combine all elements of parh, in order, to form a string - using URL delimiters.
  * Duplicate delimiters are trimmed.
  *
  * @param array $parts
@@ -81,8 +81,12 @@ function joinUrl(...$parts) {
       $path[] = $part;
     }
   }
-  $result = implode('/', $parts);
-  return preg_replace(';//+;', '/', $result);
+  $combined = implode('/', $parts);
+  if (preg_match(';[^:]//;', $combined)) {
+    $uri = new \GuzzleHttp\Psr7\Uri($combined);
+    $combined = (string) $uri->withPath(preg_replace(';//+;', '/', $uri->getPath()));
+  }
+  return $combined;
 }
 
 function toJSON($data) {
@@ -183,4 +187,3 @@ function plugins($names = NULL) {
     return $GLOBALS['plugins'];
   }
 }
-
