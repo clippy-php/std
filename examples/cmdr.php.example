@@ -1,0 +1,16 @@
+<?php
+namespace Clippy;
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Usage: php cmdr.php.example
+
+$c = clippy()->register(plugins());
+
+$c['app']->main('', function ($io, $cmdr) {
+  $output = $cmdr->run('for VAL in {{LETTERS|s}} {{NUMBERS|s}} {{SYMBOLS|s}} ; do echo "$VAL" ; done', [
+    'LETTERS' => 'a b c d',
+    'NUMBERS' => '1 2 3 4',
+    'SYMBOLS' => '+ & > <',
+  ]);
+  $io->writeln("The output was:\n$output\n");
+});

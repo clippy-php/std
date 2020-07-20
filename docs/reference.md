@@ -50,6 +50,24 @@ $c['app']->run();
 
 See: https://github.com/mnapoli/silly/
 
+## Plugin: `cmdr` (`Cmdr.php`)
+
+A helper for constructing and executing shell commands. It provides helpers to escape variables in a command line expression.
+
+Examples:
+
+```php
+// Run a command, assert success, and return the output.
+$output = $cmdr->run('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
+
+// Prepare a Symfony "Process" object based on this command.
+// It's up to you to handle execution, error-checking, etc.
+$process = $cmdr->process('echo {{MESSAGE|js}} | json_pp', ['MESSAGE' => 'The stuff.']);
+
+// Evaluate the command string
+$fullCmdStr = $cmdr->escape('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
+```
+
 ## Plugin: `cred` (`Credentials.php`)
 
 A helper for loading credentials in CLI. Generally, credentials come from one of the following (in order of decreasing precedence):
