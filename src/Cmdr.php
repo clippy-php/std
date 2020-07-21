@@ -32,6 +32,9 @@ class Cmdr {
     $c->set('cmdr', function (SymfonyStyle $io) {
       $cmdr = new Cmdr();
       $cmdr->io = $io;
+      $cmdr->defaults = [
+        'timeout' => NULL,
+      ];
       return $cmdr;
     });
     return $c;
@@ -41,6 +44,12 @@ class Cmdr {
    * @var \Symfony\Component\Console\Style\SymfonyStyle
    */
   protected $io;
+
+  /**
+   * @var array
+   *   List of defaults to set on any newly contructed processes.
+   */
+  protected $defaults = [];
 
   /**
    * Run a command, assert the outcome is OK, and return all output.
@@ -113,7 +122,17 @@ class Cmdr {
       return $cmd;
     }
     else {
-      return new Process($this->escape($cmd, $vars ?: []));
+      $p = new Process($this->escape($cmd, $vars ?: []));
+      foreach ($this->defaults as $key => $value) {
+        $method = 'set' . strtoupper($key{0}) . substr($key, 1);
+        if (is_callable([$p, $method])) {
+          $p->$method($value);
+        }
+        else {
+          throw new \RuntimeException("Cannot apply default for Process::\$" . $key);
+        }
+      }
+      return $p;
     }
   }
 
@@ -175,6 +194,28 @@ class Cmdr {
       }
       return $val;
     }, $cmd);
+  }
+
+  /**
+   * Set a list of default properties for newly constructed processes.
+   *
+   * @param array $defaults
+   *   Ex: ['timeout' => 90, 'idleTimeout' => 30]
+   * @return static
+   * @see Process
+   */
+  public function setDefaults($defaults) {
+    $this->defaults = $defaults;
+    return $this;
+  }
+
+  /**
+   * @return array
+   *   Ex: ['timeout' => 90, 'idleTimeout' => 30]
+   * @see Process
+   */
+  public function getDefaults() {
+    return $defaults;
   }
 
 }
