@@ -68,6 +68,37 @@ class Cmdr {
   }
 
   /**
+   * Run a command, passing output through to the console, and asserting that
+   * the outcome is OK.
+   *
+   * TIP: If you need more precise control over error-conditions, pipes, etc,
+   * then use `process()` and the Symfony Process API.
+   *
+   * @param string|Process $cmd
+   * @param array|null $vars
+   * @return \Symfony\Component\Process\Process
+   */
+  public function passthru($cmd, $vars = NULL) {
+    $process = $this->process($cmd, $vars);
+    $this->io->writeln("<comment>\$</comment> " . $process->getCommandLine() . " <comment>[[in " . $process->getWorkingDirectory() . "]]</comment>", OutputInterface::VERBOSITY_VERBOSE);
+    $process->run(function($type, $buffer) {
+      if (Process::ERR === $type) {
+        fwrite(STDERR, $buffer);
+      }
+      else {
+        $this->io->write($buffer);
+      }
+    });
+
+    if (!$process->isSuccessful()) {
+      $this->io->writeln("<error>Command failed:</error> " . $process->getCommandLine() . " <comment>[[in " . $process->getWorkingDirectory() . "]]</comment>", OutputInterface::VERBOSITY_VERBOSE);
+      throw new CmdrProcessException($process);
+    }
+
+    return $process;
+  }
+
+  /**
    * Create a "Process" object for the given command.
    *
    * TIP: If you just want to run the command without tracking the

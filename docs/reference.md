@@ -60,6 +60,9 @@ Examples:
 // Run a command, assert success, and return the output.
 $output = $cmdr->run('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
 
+// Run a command, pass output through to console, and assert success.
+$cmdr->passthru('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
+
 // Prepare a Symfony "Process" object based on this command.
 // It's up to you to handle execution, error-checking, etc.
 $process = $cmdr->process('echo {{MESSAGE|js}} | json_pp', ['MESSAGE' => 'The stuff.']);
