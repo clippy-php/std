@@ -124,7 +124,7 @@ class Cmdr {
     else {
       $p = new Process($this->escape($cmd, $vars ?: []));
       foreach ($this->defaults as $key => $value) {
-        $method = 'set' . strtoupper($key{0}) . substr($key, 1);
+        $method = 'set' . strtoupper($key[0]) . substr($key, 1);
         if (is_callable([$p, $method])) {
           $p->$method($value);
         }
