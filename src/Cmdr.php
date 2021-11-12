@@ -167,7 +167,7 @@ class Cmdr {
       $modifier = ltrim($modifier ?? '', '|');
 
       for ($i = 0; $i < strlen($modifier); $i++) {
-        switch ($modifier{$i}) {
+        switch ($modifier[$i]) {
           case 's':
             $val = escapeshellarg($val);
             break;
