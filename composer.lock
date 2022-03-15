@@ -4,32 +4,33 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "432c6b0a5dbe4b24e224735075909714",
+    "content-hash": "f99591e95440d768cd805ec65deebe87",
     "packages": [
         {
             "name": "clippy/container",
-            "version": "v1.0.0",
+            "version": "v1.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/clippy-php/container.git",
-                "reference": "cf50a5e7a20b25f87a779157521fe4cb2420531f"
+                "reference": "32e96b45992b5be2d55ba1e548597ddaf83ae471"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/clippy-php/container/zipball/cf50a5e7a20b25f87a779157521fe4cb2420531f",
-                "reference": "cf50a5e7a20b25f87a779157521fe4cb2420531f",
+                "url": "https://api.github.com/repos/clippy-php/container/zipball/32e96b45992b5be2d55ba1e548597ddaf83ae471",
+                "reference": "32e96b45992b5be2d55ba1e548597ddaf83ae471",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0",
                 "php-di/invoker": "~2.0",
-                "pimple/pimple": "~3.0"
+                "pimple/pimple": "~3.0",
+                "psr/container": "~1.0"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Pimple\\": "src/Pimple/",
-                    "Clippy\\": "src/Clippy/"
+                    "Clippy\\": "src/Clippy/",
+                    "Pimple\\": "src/Pimple/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -43,7 +44,11 @@
                 }
             ],
             "description": "Dependency-injection container inspired by Pimple and PHP-DI Invoker",
-            "time": "2019-12-08T07:46:17+00:00"
+            "support": {
+                "issues": "https://github.com/clippy-php/container/issues",
+                "source": "https://github.com/clippy-php/container/tree/v1.3.1"
+            },
+            "time": "2022-03-15T22:48:21+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -823,5 +828,5 @@
     "platform-overrides": {
         "php": "7.0.8"
     },
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.1.0"
 }
