@@ -1,0 +1,20 @@
+<?php
+namespace Clippy;
+
+use Symfony\Component\Console\Style\StyleInterface;
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+$c = clippy()->register(plugins());
+
+$c['app']->command('greet [-N|--dry-run] [-S|--step] [name]', function (StyleInterface  $io, Taskr $taskr, ?string $name) {
+  $taskr->passthru('echo {{0|s}}', ["Hello $name!"]);
+});
+
+$c['app']->command('chatty [-N|--dry-run] [-S|--step]', function (StyleInterface  $io, Taskr $taskr) {
+  $taskr->passthru('echo {{0|s}}', ["This is the chatty command."]);
+  $taskr->subcommand('greet bob');
+  $taskr->passthru('echo {{0|s}}', ["I hope you had enough!"]);
+});
+
+$c['app']->run();
