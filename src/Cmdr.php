@@ -2,7 +2,7 @@
 namespace Clippy;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Process\Process;
 
 /**
@@ -28,28 +28,34 @@ use Symfony\Component\Process\Process;
  */
 class Cmdr {
 
-  public static function register(Container $c) {
-    $c->set('cmdr', function (SymfonyStyle $io) {
-      $cmdr = new Cmdr();
-      $cmdr->io = $io;
-      $cmdr->defaults = [
+  public static function register(Container $c): Container {
+    $c->set('cmdr', function (StyleInterface $io) {
+      return new Cmdr($io, [
         'timeout' => NULL,
-      ];
-      return $cmdr;
+      ]);
     });
     return $c;
   }
 
   /**
-   * @var \Symfony\Component\Console\Style\SymfonyStyle
+   * @var \Symfony\Component\Console\Style\StyleInterface
    */
   protected $io;
 
   /**
    * @var array
-   *   List of defaults to set on any newly contructed processes.
+   *   List of defaults to set on any newly constructed processes.
    */
   protected $defaults = [];
+
+  /**
+   * @param \Symfony\Component\Console\Style\StyleInterface $io
+   * @param array $defaults
+   */
+  public function __construct(StyleInterface $io, array $defaults) {
+    $this->io = $io;
+    $this->defaults = $defaults;
+  }
 
   /**
    * Run a command, assert the outcome is OK, and return all output.
@@ -57,13 +63,13 @@ class Cmdr {
    * TIP: If you need more precise control over error-conditions, pipes, etc,
    * then use `process()` and the Symfony Process API.
    *
-   * @param string|Process $cmd
+   * @param string|\Symfony\Component\Process\Process $cmd
    * @param array|null $vars
    * @return string
    *   The console output of the command.
    * @throws CmdrProcessException
    */
-  public function run($cmd, $vars = NULL) {
+  public function run($cmd, ?array $vars = NULL): string {
     $process = $this->process($cmd, $vars);
     $this->io->writeln("<comment>\$</comment> " . $process->getCommandLine() . " <comment>[[in " . $process->getWorkingDirectory() . "]]</comment>", OutputInterface::VERBOSITY_VERBOSE);
     $process->run();
@@ -83,11 +89,11 @@ class Cmdr {
    * TIP: If you need more precise control over error-conditions, pipes, etc,
    * then use `process()` and the Symfony Process API.
    *
-   * @param string|Process $cmd
+   * @param string|\Symfony\Component\Process\Process $cmd
    * @param array|null $vars
    * @return \Symfony\Component\Process\Process
    */
-  public function passthru($cmd, $vars = NULL) {
+  public function passthru($cmd, ?array $vars = NULL): \Symfony\Component\Process\Process {
     $process = $this->process($cmd, $vars);
     $this->io->writeln("<comment>\$</comment> " . $process->getCommandLine() . " <comment>[[in " . $process->getWorkingDirectory() . "]]</comment>", OutputInterface::VERBOSITY_VERBOSE);
     if (function_exists('posix_isatty')) {
@@ -116,11 +122,11 @@ class Cmdr {
    * TIP: If you just want to run the command without tracking the
    * errors/outputs carefully, then use run().
    *
-   * @param string|Process $cmd
+   * @param string|\Symfony\Component\Process\Process $cmd
    * @param array|NULL $vars
    * @return \Symfony\Component\Process\Process
    */
-  public function process($cmd, $vars = NULL) {
+  public function process($cmd, ?array $vars = NULL): \Symfony\Component\Process\Process {
     if ($cmd instanceof Process) {
       return $cmd;
     }
@@ -162,7 +168,7 @@ class Cmdr {
    * @return string
    *   The content of $cmd with $vars interpolated.
    */
-  public function escape($cmd, $vars = []) {
+  public function escape(string $cmd, ?array $vars = []): string {
     return preg_replace_callback('/\{\{([A-Za-z0-9_]+)(\|\w+)?\}\}/', function ($m) use ($vars) {
       $var = $m[1];
       $val = $vars[$var] ?? '';
@@ -207,7 +213,7 @@ class Cmdr {
    * @return static
    * @see Process
    */
-  public function setDefaults($defaults) {
+  public function setDefaults(array $defaults) {
     $this->defaults = $defaults;
     return $this;
   }
@@ -217,8 +223,8 @@ class Cmdr {
    *   Ex: ['timeout' => 90, 'idleTimeout' => 30]
    * @see Process
    */
-  public function getDefaults() {
-    return $defaults;
+  public function getDefaults(): array {
+    return $this->defaults;
   }
 
 }
