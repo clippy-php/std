@@ -1,5 +1,5 @@
 <?php
-namespace Clippy;
+namespace Clippy\Exception;
 
 class CmdrProcessException extends \RuntimeException {
 

@@ -1,5 +1,7 @@
 <?php
 
+class_alias('Clippy\Exception\CmdrProcessException', 'Clippy\CmdrProcessException');
+
 $GLOBALS['plugins']['app'] = ['\Clippy\ConsoleApp', 'register'];
 $GLOBALS['plugins']['cmdr'] = ['\Clippy\Cmdr', 'register'];
 $GLOBALS['plugins']['taskr'] = ['\Clippy\Taskr', 'register'];
