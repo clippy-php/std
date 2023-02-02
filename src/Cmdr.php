@@ -90,6 +90,9 @@ class Cmdr {
   public function passthru($cmd, $vars = NULL) {
     $process = $this->process($cmd, $vars);
     $this->io->writeln("<comment>\$</comment> " . $process->getCommandLine() . " <comment>[[in " . $process->getWorkingDirectory() . "]]</comment>", OutputInterface::VERBOSITY_VERBOSE);
+    if (function_exists('posix_isatty')) {
+      $process->setTty(\posix_isatty(STDOUT));
+    }
     $process->run(function($type, $buffer) {
       if (Process::ERR === $type) {
         fwrite(STDERR, $buffer);
