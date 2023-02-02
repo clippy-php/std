@@ -1,6 +1,7 @@
 <?php
 namespace Clippy;
 
+use Clippy\Internal\Shell;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Process\Process;
@@ -178,7 +179,7 @@ class Cmdr {
       for ($i = 0; $i < strlen($modifier); $i++) {
         switch ($modifier[$i]) {
           case 's':
-            $val = escapeshellarg($val);
+            $val = Shell::lazyEscape($val);
             break;
 
           case 'u':
