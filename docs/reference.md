@@ -60,6 +60,9 @@ Examples:
 // Run a command, assert success, and return the output.
 $output = $cmdr->run('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
 
+// As above, but provide an array with multiple parameters
+$output = $cmdr->run('ls -l {{FILES|@s}}', ['FILES' => ['1.txt', '2.txt', '3.txt']]);
+
 // Run a command, pass output through to console, and assert success.
 $cmdr->passthru('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
 

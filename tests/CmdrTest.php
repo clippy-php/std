@@ -24,6 +24,19 @@ class CmdrTest extends TestCase {
     $this->assertEquals('echo \'"hello \ud83e\udd86!"\'', $cmdr->escape('echo {{0|js}}', ['hello 🦆!']));
     $this->assertEquals('echo --name world', $cmdr->escape('echo {{0}}', ['--name world']));
     $this->assertEquals('echo \'--name world\'', $cmdr->escape('echo {{0|s}}', ['--name world']));
+
+    $this->assertEquals('echo hello bob', $cmdr->escape('echo hello {{NAME|s}}', ['NAME' => 'bob', 'EXTRA' => 1234]));
+    $this->assertEquals('echo --one=uno --two=\'dos dos\'', $cmdr->escape('echo --one={{ONE|s}} --two={{TWO|s}}', ['TWO' => 'dos dos', 'ONE' => 'uno']));
+    $this->assertEquals('echo ok \'foo bar\' whiz', $cmdr->escape('echo {{2|s}} {{1|s}} {{0|s}}', ['whiz', 'foo bar', 'ok']));
+
+    $array = ['ab cd', 'ef gh', 'ij kl'];
+    $this->assertEquals('echo \'ab cd\' \'ef gh\' \'ij kl\'', $cmdr->escape('echo {{ARRAY|@s}}', ['ARRAY' => $array]));
+    $this->assertEquals('echo \'"ab cd"\' \'"ef gh"\' \'"ij kl"\'', $cmdr->escape('echo {{ARRAY|@js}}', ['ARRAY' => $array]));
+    $this->assertEquals('echo \'["ab cd","ef gh","ij kl"]\'', $cmdr->escape('echo {{ARRAY|js}}', ['ARRAY' => $array]));
+
+    $obj = new \stdClass();
+    $obj->a = 'apple';
+    $this->assertEquals('echo \'{"a":"apple"}\'', $cmdr->escape('echo {{OBJ|js}}', ['OBJ' => $obj]));
   }
 
   public function testRun() {

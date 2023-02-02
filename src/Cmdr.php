@@ -153,53 +153,82 @@ class Cmdr {
    * @param string $cmd
    *   Ex: 'ls {{TGT_PATH|s}} | wc'
    *
-   *   Note: Variables may be expressed `{{FOO}}`.
+   *   Variables are marked with '{{...}}`, as in `{{FOO}}`.
+   *
    *   To add escaping to a variable, you may append one or more modifiers.
    *     - 'u': URL escaping
    *     - 'h': HTML escaping
    *     - '6': Base64 escaping
    *     - 'j': JSON escaping
    *     - 's': Shell escaping
-   *   If multiple escape-modifiers are listed, they will be applied in the
-   *   order given.
    *
-   *   Ex: '{{TGT_PATH|6js}}' would be equivalient to `escapeshellarg(json_encode(base64_encode($TGT_PATH)))`
+   *   Ex: '{{TGT_PATH|s}}' would be equivalent to `escapeshellarg($TGT_PATH)`
+   *
+   *   If multiple escape-modifiers are listed, they will be applied in the order given.
+   *
+   *   Ex: '{{TGT_PATH|6js}}' would be equivalent to calling base64_encode() + json_encode() + escapeshellarg(),
+   *       as in `escapeshellarg(json_encode(base64_encode($TGT_PATH)))`
+   *
+   *   Additionally, the modifier '@' indicates multi-parameter-mode (array-mode). In this mode, you may give an array
+   *   of inputs, and each will be escaped separately.
+   *
+   *   Ex: 'ls {{TGT_PATHS|@s}}' would be equivalent to calling `escapeshellarg` and joining with ' ',
+   *       as in 'implode(' ', array_map('escapeshellarg', $TGT_PATHS))`
+   *
    * @param array|NULL $vars
-   *   List of variable values that may be interpolated.
+   *   List of variables that may be interpolated.
+   *   Variables may be keyed by names (for better readability) or numbers (for more concision).
    * @return string
    *   The content of $cmd with $vars interpolated.
    */
   public function escape(string $cmd, ?array $vars = []): string {
-    return preg_replace_callback('/\{\{([A-Za-z0-9_]+)(\|\w+)?\}\}/', function ($m) use ($vars) {
+    return preg_replace_callback('/\{\{([A-Za-z0-9_]+)(\|[@\w]+)?\}\}/', function ($m) use ($cmd, $vars) {
       $var = $m[1];
       $val = $vars[$var] ?? '';
       $modifier = $m[2] ?? NULL;
       $modifier = ltrim($modifier ?? '', '|');
+      $isMultiParamMode = FALSE;
+
+      $apply = function($func, $value) use (&$isMultiParamMode) {
+        return $isMultiParamMode && is_array($value) ? array_map($func, $value) : $func($value);
+      };
 
       for ($i = 0; $i < strlen($modifier); $i++) {
         switch ($modifier[$i]) {
+          case '@':
+            $isMultiParamMode = TRUE;
+            break;
+
           case 's':
-            $val = Shell::lazyEscape($val);
+            $val = $apply([Shell::class, 'lazyEscape'], $val);
             break;
 
           case 'u':
-            $val = urlencode($val);
+            $val = $apply('urlencode', $val);
             break;
 
           case 'h':
-            $val = htmlentities($val);
+            $val = $apply('htmlentities', $val);
             break;
 
           case '6':
-            $val = base64_encode($val);
+            $val = $apply('base64_encode', $val);
             break;
 
           case 'j':
-            $val = json_encode($val);
+            $val = $apply('json_encode', $val);
             break;
 
           default:
             //printf("FIXME: handle modifier [%s]\n", $modifier{$i});
+        }
+      }
+      if (is_array($val)) {
+        if ($isMultiParamMode) {
+          $val = implode(' ', (array) $val);
+        }
+        else {
+          trigger_error(sprintf('In expression \"%s\", item \"%s\" resolved to an array', $cmd, $m[0]), E_USER_WARNING);
         }
       }
       return $val;
