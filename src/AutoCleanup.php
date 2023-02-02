@@ -3,6 +3,15 @@ namespace Clippy;
 
 /**
  * Define a local cleanup object (which will run on-destruct).
+ *
+ * Example:
+ *
+ * ```
+ * $foo = allocateResource();
+ * $cleanup = new AutoCleanup(function() use ($foo) {
+ *   releaseResource($foo);
+ * });
+ * ```
  */
 class AutoCleanup {
 
