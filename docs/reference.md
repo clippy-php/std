@@ -74,6 +74,29 @@ $process = $cmdr->process('echo {{MESSAGE|js}} | json_pp', ['MESSAGE' => 'The st
 $fullCmdStr = $cmdr->escape('ls {{FILE|s}}', ['FILE' => '/home/foo bar/whiz&bang']);
 ```
 
+(_Full example: [examples/cmdr.php.example](../examples/cmdr.php.example)_)
+
+## Plugin: `taskr` (`Taskr.php`)
+
+`Taskr` builds on top of `Cmdr`. Both run external commands, but `taskr` provides more decoration, e.g.
+
+* If your script is called with `--dry-run`, then tasks are printed instead of executed.
+* If your script is called with `--step` then it prompts the user before executing each task.
+* If your script is called with `-vv`, then tasks are printed with more detail.
+
+Examples:
+
+```php
+// Call an external command
+$taskr->passthru('sudo iptables -F');
+$taskr->passthru('sudo iptables -X');
+
+// Call another subcommand within the same application
+$taskr->subcommand('greet bob');
+```
+
+(_Full example: [examples/taskr.php.example](../examples/taskr.php.example)_)
+
 ## Plugin: `cred` (`Credentials.php`)
 
 A helper for loading credentials in CLI. Generally, credentials come from one of the following (in order of decreasing precedence):
