@@ -1,6 +1,7 @@
 <?php
 namespace Clippy;
 
+use LesserEvil\ShellVerbosityIsEvil;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -24,6 +25,12 @@ class Application extends \Silly\Application {
     $this->command("main $sig", $callback);
     $this->setDefaultCommand('main', TRUE);
     return $this->run();
+  }
+
+  protected function configureIO(InputInterface $input, OutputInterface $output): void {
+    ShellVerbosityIsEvil::doWithoutEvil(function() use ($input, $output) {
+      parent::configureIO($input, $output);
+    });
   }
 
 }
