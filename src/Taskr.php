@@ -105,6 +105,63 @@ class Taskr {
   }
 
   /**
+   * Call an external command and return the output.
+   *
+   * Note: Recall the key differentiator between Cmdr and Taskr is that Taskr allows for conditional
+   * execution (eg `--dry-run` or `--step`). If you call `run()` but the user decides not to execute,
+   * then you may get a NULL result. If you need non-null value for skipped steps, try `??`, e.g.
+   *
+   *   $taskr->run('cat hello.txt') ?? 'Skipped hello world';
+   *
+   * @param string $cmd
+   * @param array $params
+   * @return string|null
+   *   The output of the command.
+   *   If the command is skipped (b/c --dry-run or --step), then NULL.
+   * @throws \Clippy\Exception\CmdrProcessException
+   */
+  public function run(string $cmd, array $params = []): ?string {
+    $this->assertConfigured();
+
+    // We resolve these variables as-needed because that works better with recursive command invocations.
+
+    /**
+     * @var \Symfony\Component\Console\Style\StyleInterface $io
+     * @var \Symfony\Component\Console\Input\InputInterface $input
+     * @var Cmdr $cmdr
+     */
+    $io = $this->c['io'];
+    $input = $this->c['input'];
+    $cmdr = $this->c['cmdr'];
+    $extraVerbosity = 0;
+    $cwd = $this->defaults['workingDirectory'] ?? getcwd();
+    $cmdDesc = '<comment>$</comment> ' . $cmdr->escape($cmd, $params) . ' <comment>[[in ' . $cwd . ']]</comment>';
+
+    if ($input->hasOption('step') && $input->getOption('step')) {
+      $extraVerbosity = OutputInterface::VERBOSITY_VERBOSE - $io->getVerbosity();
+      if (!$this->confirmExecute($io, $cmdDesc)) {
+        return NULL;
+      }
+    }
+
+    if ($input->hasOption('dry-run') && $input->getOption('dry-run')) {
+      $io->writeln('<comment>DRY-RUN</comment>' . $cmdDesc);
+      return NULL;
+    }
+
+    try {
+      $io->setVerbosity($io->getVerbosity() + $extraVerbosity);
+      $result = $cmdr->withDefaults($this->getDefaults())->run($cmd, $params);
+      if ($io->getVerbosity() + $extraVerbosity >= OutputInterface::VERBOSITY_VERBOSE) {
+        $io->writeln($result);
+      }
+      return $result;
+    } finally {
+      $io->setVerbosity($io->getVerbosity() - $extraVerbosity);
+    }
+  }
+
+  /**
    * Call a different subcommand (within the same application / same process).
    *
    * Note: The $input will be temporarily replaced with a new $input, based on the requested command options.
