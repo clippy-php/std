@@ -6,6 +6,7 @@ use Clippy\Internal\CmdrDefaultsTrait;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\StyleInterface;
 
 /**
  * The `Taskr` ("tasker") is a small utility for writing adhoc scripts that run
@@ -85,25 +86,8 @@ class Taskr {
 
     if ($input->hasOption('step') && $input->getOption('step')) {
       $extraVerbosity = OutputInterface::VERBOSITY_VERBOSE - $io->getVerbosity();
-      $io->writeln('<comment>COMMAND</comment>' . $cmdDesc);
-      $confirmation = ($io->ask('<info>Execute this command?</info> (<comment>[Y]</comment>es, <comment>[s]</comment>kip, <comment>[q]</comment>uit)', NULL, function ($value) {
-        $value = ($value === NULL) ? 'y' : mb_strtolower($value);
-        if (!in_array($value, ['y', 's', 'q'])) {
-          throw new InvalidArgumentException("Invalid choice ($value)");
-        }
-        return $value;
-      }));
-      switch ($confirmation) {
-        case 's':
-          return;
-
-        case 'y':
-        case NULL:
-          break;
-
-        case 'q':
-        default:
-          throw new UserQuitException();
+      if (!$this->confirmExecute($io, $cmdDesc)) {
+        return;
       }
     }
 
@@ -171,6 +155,37 @@ class Taskr {
       }
     } finally {
       $this->c['input'] = $origInput;
+    }
+  }
+
+  /**
+   * @param \Symfony\Component\Console\Style\StyleInterface $io
+   * @param string $cmdDesc
+   * @return bool
+   *   TRUE: Execute it
+   *   FALSE: Skip it
+   * @throws \Clippy\Exception\UserQuitException
+   */
+  protected function confirmExecute(StyleInterface $io, $cmdDesc): bool {
+    $io->writeln('<comment>COMMAND</comment>' . $cmdDesc);
+    $confirmation = ($io->ask('<info>Execute this command?</info> (<comment>[Y]</comment>es, <comment>[s]</comment>kip, <comment>[q]</comment>uit)', NULL, function ($value) {
+      $value = ($value === NULL) ? 'y' : mb_strtolower($value);
+      if (!in_array($value, ['y', 's', 'q'])) {
+        throw new InvalidArgumentException("Invalid choice ($value)");
+      }
+      return $value;
+    }));
+    switch ($confirmation) {
+      case 's':
+        return FALSE;
+
+      case 'y':
+      case NULL:
+        return TRUE;
+
+      case 'q':
+      default:
+        throw new UserQuitException();
     }
   }
 
