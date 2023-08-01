@@ -2,6 +2,7 @@
 namespace Clippy;
 
 use Clippy\Exception\UserQuitException;
+use Clippy\Internal\CmdrDefaultsTrait;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,8 +25,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class Taskr {
 
-  public function __construct(Container $c) {
+  use CmdrDefaultsTrait;
+
+  public function __construct(Container $c, array $defaults = []) {
     $this->c = $c;
+    $this->setDefaults($defaults);
   }
 
   public static function register(Container $c): Container {
@@ -76,7 +80,8 @@ class Taskr {
     $input = $this->c['input'];
     $cmdr = $this->c['cmdr'];
     $extraVerbosity = 0;
-    $cmdDesc = '<comment>$</comment> ' . $cmdr->escape($cmd, $params) . ' <comment>[[in ' . getcwd() . ']]</comment>';
+    $cwd = $this->defaults['workingDirectory'] ?? getcwd();
+    $cmdDesc = '<comment>$</comment> ' . $cmdr->escape($cmd, $params) . ' <comment>[[in ' . $cwd . ']]</comment>';
 
     if ($input->hasOption('step') && $input->getOption('step')) {
       $extraVerbosity = OutputInterface::VERBOSITY_VERBOSE - $io->getVerbosity();
@@ -109,7 +114,7 @@ class Taskr {
 
     try {
       $io->setVerbosity($io->getVerbosity() + $extraVerbosity);
-      $cmdr->passthru($cmd, $params);
+      $cmdr->withDefaults($this->getDefaults())->passthru($cmd, $params);
     } finally {
       $io->setVerbosity($io->getVerbosity() - $extraVerbosity);
     }
@@ -127,6 +132,9 @@ class Taskr {
    * @throws \Exception
    */
   public function subcommand(string $cmd, array $params = []): void {
+    if (!empty($this->getDefaults())) {
+      throw new \RuntimeException("Error: Defaults not supported for Taskr::subcommand()");
+    }
 
     // We resolve these variables as-needed because that works better with recursive command invocations.
 

@@ -65,4 +65,24 @@ class CmdrTest extends TestCase {
     $this->assertEquals($original, $result);
   }
 
+  public function testDefaults() {
+    $cmdr = $this->createCmdr();
+    $originalCwd = getcwd();
+    $otherCwd = realpath(sys_get_temp_dir());
+
+    $a = $cmdr->run('pwd');
+    $this->assertEquals($originalCwd, trim($a), 'Use original cwd');
+
+    $b = $cmdr->withDefaults(['workingDirectory' => $otherCwd])->run('pwd');
+    $this->assertEquals($otherCwd, trim($b), 'Use temp working dir');
+
+    $c = $cmdr->run('pwd');
+    $this->assertEquals($originalCwd, trim($c), 'Use original cwd');
+
+    $d = $cmdr->withDefaults(['cwd' => $otherCwd])->run('pwd');
+    $this->assertEquals($otherCwd, trim($d), 'Use temp working dir');
+
+    $this->assertEquals($originalCwd, getcwd());
+  }
+
 }

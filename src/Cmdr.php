@@ -1,6 +1,7 @@
 <?php
 namespace Clippy;
 
+use Clippy\Internal\CmdrDefaultsTrait;
 use Clippy\Internal\Shell;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -43,19 +44,15 @@ class Cmdr {
    */
   protected $io;
 
-  /**
-   * @var array
-   *   List of defaults to set on any newly constructed processes.
-   */
-  protected $defaults = [];
+  use CmdrDefaultsTrait;
 
   /**
    * @param \Symfony\Component\Console\Style\StyleInterface $io
    * @param array $defaults
    */
-  public function __construct(StyleInterface $io, array $defaults) {
+  public function __construct(StyleInterface $io, array $defaults = []) {
     $this->io = $io;
-    $this->defaults = $defaults;
+    $this->setDefaults($defaults);
   }
 
   /**
@@ -133,7 +130,7 @@ class Cmdr {
     }
     else {
       $p = new Process($this->escape($cmd, $vars ?: []));
-      foreach ($this->defaults as $key => $value) {
+      foreach ($this->getDefaults() as $key => $value) {
         $method = 'set' . strtoupper($key[0]) . substr($key, 1);
         if (is_callable([$p, $method])) {
           $p->$method($value);
@@ -241,28 +238,6 @@ class Cmdr {
       }
       return $val;
     }, $cmd);
-  }
-
-  /**
-   * Set a list of default properties for newly constructed processes.
-   *
-   * @param array $defaults
-   *   Ex: ['timeout' => 90, 'idleTimeout' => 30]
-   * @return static
-   * @see Process
-   */
-  public function setDefaults(array $defaults) {
-    $this->defaults = $defaults;
-    return $this;
-  }
-
-  /**
-   * @return array
-   *   Ex: ['timeout' => 90, 'idleTimeout' => 30]
-   * @see Process
-   */
-  public function getDefaults(): array {
-    return $this->defaults;
   }
 
 }
