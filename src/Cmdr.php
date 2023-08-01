@@ -153,7 +153,7 @@ class Cmdr {
    * @param string $cmd
    *   Ex: 'ls {{TGT_PATH|s}} | wc'
    *
-   *   Variables are marked with '{{...}}`, as in `{{FOO}}`.
+   *   Variables are marked with curly braces, as in `{{FOO}}`.
    *
    *   To add escaping to a variable, you may append one or more modifiers.
    *     - 'u': URL escaping
@@ -175,6 +175,10 @@ class Cmdr {
    *   Ex: 'ls {{TGT_PATHS|@s}}' would be equivalent to calling `escapeshellarg` and joining with ' ',
    *       as in 'implode(' ', array_map('escapeshellarg', $TGT_PATHS))`
    *
+   *   The special variable `...` can be used to combine all variables (when numerically-indexed).
+   *
+   *   Ex: escape('ls -l {{...|@s}}', ['file 1.txt, 'file 2.txt', 'file 3.txt'])
+   *
    * @param array|NULL $vars
    *   List of variables that may be interpolated.
    *   Variables may be keyed by names (for better readability) or numbers (for more concision).
@@ -182,9 +186,13 @@ class Cmdr {
    *   The content of $cmd with $vars interpolated.
    */
   public function escape(string $cmd, ?array $vars = []): string {
-    return preg_replace_callback('/\{\{([A-Za-z0-9_]+)(\|[@\w]+)?\}\}/', function ($m) use ($cmd, $vars) {
-      $var = $m[1];
-      $val = $vars[$var] ?? '';
+    return preg_replace_callback('/\{\{(\.\.\.|[A-Za-z0-9_]+)(\|[@\w]+)?\}\}/', function ($m) use ($cmd, $vars) {
+      if ($m[1] === '...') {
+        $val = array_filter($vars, 'is_numeric', ARRAY_FILTER_USE_KEY);
+      }
+      else {
+        $val = $vars[$m[1]] ?? '';
+      }
       $modifier = $m[2] ?? NULL;
       $modifier = ltrim($modifier ?? '', '|');
       $isMultiParamMode = FALSE;

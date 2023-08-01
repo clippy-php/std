@@ -37,6 +37,18 @@ class CmdrTest extends TestCase {
     $obj = new \stdClass();
     $obj->a = 'apple';
     $this->assertEquals('echo \'{"a":"apple"}\'', $cmdr->escape('echo {{OBJ|js}}', ['OBJ' => $obj]));
+
+    $this->assertEquals('echo START apple \'Banana Ice Cream\' cherry END',
+      $cmdr->escape('echo START {{...|@s}} END',
+        ['apple', 'Banana Ice Cream', 'cherry']
+      )
+    );
+
+    $this->assertEquals('echo \'Hello World\': apple \'Banana Ice Cream\' cherry',
+      $cmdr->escape('echo {{GREET|s}}: {{...|@s}}',
+        ['GREET' => 'Hello World', 'apple', 'Banana Ice Cream', 'cherry']
+      )
+    );
   }
 
   public function testRun() {
