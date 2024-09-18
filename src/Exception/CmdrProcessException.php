@@ -8,8 +8,15 @@ class CmdrProcessException extends \RuntimeException {
    */
   private $process;
 
-  public function __construct(\Symfony\Component\Process\Process $process, $message = "", $code = 0, Exception $previous = NULL) {
+  /**
+   * @var bool
+   *   TRUE if the process has already passed-through its STDOUT/STDERR
+   */
+  private $passthru;
+
+  public function __construct(\Symfony\Component\Process\Process $process, $message = "", $code = 0, Exception $previous = NULL, bool $passthru = FALSE) {
     $this->process = $process;
+    $this->passthru = $passthru;
     if (empty($message)) {
       $message = $this->createReport($process);
     }
@@ -31,15 +38,18 @@ class CmdrProcessException extends \RuntimeException {
   }
 
   public function createReport($process) {
-    return "Process failed:
-[[ COMMAND: {$process->getCommandLine()} ]]
-[[ CWD: {$process->getWorkingDirectory()} ]]
-[[ EXIT CODE: {$process->getExitCode()} ]]
-[[ STDOUT ]]
-{$process->getOutput()}
-[[ STDERR ]]
-{$process->getErrorOutput()}
-      ";
+    $buf []= "Process failed:";
+    $buf []= "[[ COMMAND: {$process->getCommandLine()} ]]";
+    $buf []= "[[ CWD: {$process->getWorkingDirectory()} ]]";
+    $buf []= "[[ EXIT CODE: {$process->getExitCode()} ]]";
+    if (!$this->passthru) {
+      $buf []= "[[ STDOUT ]]";
+      $buf []= "{$process->getOutput()}";
+      $buf []= "[[ STDERR ]]";
+      $buf []= "{$process->getErrorOutput()}";
+    }
+    $buf []= "";
+    return implode("\n", $buf);
   }
 
 }

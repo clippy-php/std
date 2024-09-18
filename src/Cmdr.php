@@ -108,7 +108,7 @@ class Cmdr {
 
     if (!$process->isSuccessful()) {
       $this->io->writeln("<error>Command failed:</error> " . $process->getCommandLine() . " <comment>[[in " . $process->getWorkingDirectory() . "]]</comment>", OutputInterface::VERBOSITY_VERBOSE);
-      throw new CmdrProcessException($process);
+      throw new CmdrProcessException($process, '', 0, NULL, TRUE);
     }
 
     return $process;
