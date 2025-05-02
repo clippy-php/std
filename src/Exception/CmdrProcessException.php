@@ -14,7 +14,7 @@ class CmdrProcessException extends \RuntimeException {
    */
   private $passthru;
 
-  public function __construct(\Symfony\Component\Process\Process $process, $message = "", $code = 0, Exception $previous = NULL, bool $passthru = FALSE) {
+  public function __construct(\Symfony\Component\Process\Process $process, $message = "", $code = 0, ?Exception $previous = NULL, ?bool $passthru = FALSE) {
     $this->process = $process;
     $this->passthru = $passthru;
     if (empty($message)) {

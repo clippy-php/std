@@ -7,7 +7,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Application extends \Silly\Application {
 
-  public function run(InputInterface $input = NULL, OutputInterface $output = NULL) {
+  public function run(?InputInterface $input = NULL, ?OutputInterface $output = NULL) {
     $input = $input ?? $this->getContainer()->get('input');
     $output = $output ?? $this->getContainer()->get('output');
     return parent::run($input, $output);

@@ -162,7 +162,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @return Container
  */
-function clippy(InputInterface $input = NULL, OutputInterface $output = NULL) {
+function clippy(?InputInterface $input = NULL, ?OutputInterface $output = NULL) {
   $container = new Container();
   $container->set('container', $container);
   $container->set('input', $input ?? new \Symfony\Component\Console\Input\ArgvInput());
