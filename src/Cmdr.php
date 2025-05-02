@@ -129,7 +129,7 @@ class Cmdr {
       return $cmd;
     }
     else {
-      $p = new Process($this->escape($cmd, $vars ?: []));
+      $p = Process::fromShellCommandline($this->escape($cmd, $vars ?: []));
       foreach ($this->getDefaults() as $key => $value) {
         $method = 'set' . strtoupper($key[0]) . substr($key, 1);
         if (is_callable([$p, $method])) {
