@@ -1,0 +1,17 @@
+<?php
+namespace Clippy;
+require_once __DIR__ . '/../vendor/autoload.php';
+
+// Usage: php guzzle.php.example
+
+$c = clippy()->register(plugins());
+
+$c['app']->main('', function ($io, $guzzleHandler) {
+
+  $client = new \GuzzleHttp\Client([
+    'handler' => $guzzleHandler,
+  ]);
+
+  $output = (string) $client->get('https://api.ipify.org?format=json')->getBody();
+  $io->writeln("The output was:\n$output\n");
+});
