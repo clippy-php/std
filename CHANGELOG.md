@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.5
+
+* __PHP__: Raise minimum to v7.4. Add support for v8.4
+* __Requirements__: Guzzle 6 => 7
+* __Requirements__: Symfony Process {2,3,4} => 5.4
+    * The most significant change is that `new Process(string)` becomes `Process::fromShellCommandline(string)`
+
 ## v0.4
 
 * __PHP__: Raise minimum to v7.2.
